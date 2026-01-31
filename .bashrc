@@ -1,0 +1,1 @@
+echo 'alias venv="source ~/home/priyanshi/Desktop/client_requirements/user_requirements/venv/bin/activate"' >> ~/.bashrc
