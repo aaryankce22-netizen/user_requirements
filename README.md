@@ -4,6 +4,14 @@ A centralized web-based system to collect and manage all client requirements and
 
 **8th Semester Project**
 
+## 🌐 Running URLs
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Frontend** | http://localhost:3000 | React application with 3D UI |
+| **Backend API** | http://localhost:5000 | Node.js REST API |
+| **API Health Check** | http://localhost:5000/api/health | Check if backend is running |
+
 ## 🚀 Tech Stack
 
 ### Frontend
