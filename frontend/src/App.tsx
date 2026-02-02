@@ -10,8 +10,14 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import ProjectsPage from './pages/ProjectsPage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
+import NewProjectPage from './pages/NewProjectPage';
 import RequirementsPage from './pages/RequirementsPage';
+import RequirementDetailPage from './pages/RequirementDetailPage';
+import NewRequirementPage from './pages/NewRequirementPage';
 import AssetsPage from './pages/AssetsPage';
+import SettingsPage from './pages/SettingsPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   return (
@@ -32,6 +38,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
+          {/* Projects Routes */}
           <Route
             path="/projects"
             element={
@@ -41,6 +49,32 @@ function App() {
             }
           />
           <Route
+            path="/projects/new"
+            element={
+              <ProtectedRoute>
+                <NewProjectPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects/:id"
+            element={
+              <ProtectedRoute>
+                <ProjectDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects/:id/edit"
+            element={
+              <ProtectedRoute>
+                <NewProjectPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Requirements Routes */}
+          <Route
             path="/requirements"
             element={
               <ProtectedRoute>
@@ -49,6 +83,32 @@ function App() {
             }
           />
           <Route
+            path="/requirements/new"
+            element={
+              <ProtectedRoute>
+                <NewRequirementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/requirements/:id"
+            element={
+              <ProtectedRoute>
+                <RequirementDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/requirements/:id/edit"
+            element={
+              <ProtectedRoute>
+                <NewRequirementPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Assets Routes */}
+          <Route
             path="/assets"
             element={
               <ProtectedRoute>
@@ -56,11 +116,21 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Settings & Profile Routes */}
           <Route
             path="/settings"
             element={
               <ProtectedRoute>
-                <div className="p-8">Settings Page - Coming Soon</div>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />

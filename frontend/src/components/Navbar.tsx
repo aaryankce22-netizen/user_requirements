@@ -77,10 +77,13 @@ const Navbar: React.FC = () => {
 
           {/* User Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-gray-700">
+            <Link
+              to="/profile"
+              className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition-colors"
+            >
               <UserCircleIcon className="w-8 h-8" />
               <span className="text-sm font-medium">{user?.name}</span>
-            </div>
+            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
