@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
+import { useAuth } from '../context/AuthContext';
 import { projectsAPI } from '../services/api';
 import {
   PlusIcon,
@@ -13,10 +14,14 @@ import {
 } from '@heroicons/react/24/outline';
 
 const ProjectsPage: React.FC = () => {
+  const { user } = useAuth();
   const [projects, setProjects] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  // Check if user can create projects (admin and manager only)
+  const canCreateProject = user?.role === 'admin' || user?.role === 'manager';
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -78,15 +83,21 @@ const ProjectsPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-            <p className="text-gray-500 mt-1">Manage all your client projects</p>
+            <p className="text-gray-500 mt-1">
+              {user?.role === 'client' 
+                ? 'View your assigned projects' 
+                : 'Manage all your client projects'}
+            </p>
           </div>
-          <Link
-            to="/projects/new"
-            className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/30"
-          >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            New Project
-          </Link>
+          {canCreateProject && (
+            <Link
+              to="/projects/new"
+              className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/30"
+            >
+              <PlusIcon className="w-5 h-5 mr-2" />
+              New Project
+            </Link>
+          )}
         </div>
 
         {/* Filters */}

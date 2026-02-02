@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
+import { useAuth } from '../context/AuthContext';
 import { projectsAPI, requirementsAPI, assetsAPI } from '../services/api';
 import {
   ArrowLeftIcon,
@@ -15,11 +16,13 @@ import {
   ClockIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 const ProjectDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [project, setProject] = useState<any>(null);
   const [requirements, setRequirements] = useState<any[]>([]);
   const [assets, setAssets] = useState<any[]>([]);
@@ -27,6 +30,16 @@ const ProjectDetailPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Team member management state
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [availableMembers, setAvailableMembers] = useState<any[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [addingMember, setAddingMember] = useState<string | null>(null);
+  const [removingMember, setRemovingMember] = useState<string | null>(null);
+
+  // Check if current user can manage team
+  const canManageTeam = user?.role === 'admin' || user?.role === 'manager';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +63,51 @@ const ProjectDetailPage: React.FC = () => {
 
     fetchData();
   }, [id, navigate]);
+
+  // Fetch available members when modal opens
+  const handleOpenAddMemberModal = async () => {
+    if (!id) return;
+    setShowAddMemberModal(true);
+    setLoadingMembers(true);
+    try {
+      const response = await projectsAPI.getAvailableMembers(id);
+      setAvailableMembers(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching available members:', error);
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
+  // Add team member
+  const handleAddMember = async (userId: string) => {
+    if (!id) return;
+    setAddingMember(userId);
+    try {
+      const response = await projectsAPI.addTeamMember(id, userId);
+      setProject(response.data.data);
+      // Remove from available members list
+      setAvailableMembers(prev => prev.filter(m => m._id !== userId));
+    } catch (error) {
+      console.error('Error adding team member:', error);
+    } finally {
+      setAddingMember(null);
+    }
+  };
+
+  // Remove team member
+  const handleRemoveMember = async (userId: string) => {
+    if (!id) return;
+    setRemovingMember(userId);
+    try {
+      const response = await projectsAPI.removeTeamMember(id, userId);
+      setProject(response.data.data);
+    } catch (error) {
+      console.error('Error removing team member:', error);
+    } finally {
+      setRemovingMember(null);
+    }
+  };
 
   const handleDelete = async () => {
     if (!id) return;
@@ -422,16 +480,21 @@ const ProjectDetailPage: React.FC = () => {
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-gray-900">Team Members</h3>
-                <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm">
-                  <PlusIcon className="w-4 h-4 mr-2" />
-                  Add Member
-                </button>
+                {canManageTeam && (
+                  <button
+                    onClick={handleOpenAddMemberModal}
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    <PlusIcon className="w-4 h-4 mr-2" />
+                    Add Member
+                  </button>
+                )}
               </div>
               {project.teamMembers && project.teamMembers.length > 0 ? (
                 <div className="space-y-3">
                   {project.teamMembers.map((member: any, index: number) => (
                     <div
-                      key={index}
+                      key={member._id || index}
                       className="flex items-center justify-between p-4 rounded-xl bg-gray-50"
                     >
                       <div className="flex items-center space-x-3">
@@ -443,9 +506,25 @@ const ProjectDetailPage: React.FC = () => {
                           <p className="text-sm text-gray-500">{member.email}</p>
                         </div>
                       </div>
-                      <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium capitalize">
-                        {member.role || 'member'}
-                      </span>
+                      <div className="flex items-center space-x-3">
+                        <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+                          Team Member
+                        </span>
+                        {canManageTeam && (
+                          <button
+                            onClick={() => handleRemoveMember(member._id)}
+                            disabled={removingMember === member._id}
+                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                            title="Remove member"
+                          >
+                            {removingMember === member._id ? (
+                              <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <XMarkIcon className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -453,11 +532,93 @@ const ProjectDetailPage: React.FC = () => {
                 <div className="text-center py-8">
                   <UserGroupIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-gray-500">No team members assigned</p>
+                  {canManageTeam && (
+                    <button
+                      onClick={handleOpenAddMemberModal}
+                      className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      + Add your first team member
+                    </button>
+                  )}
                 </div>
               )}
             </div>
           )}
         </motion.div>
+
+        {/* Add Team Member Modal */}
+        {showAddMemberModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl max-h-[80vh] overflow-hidden flex flex-col"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-gray-900">Add Team Member</h3>
+                <button
+                  onClick={() => setShowAddMemberModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <XMarkIcon className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              
+              {loadingMembers ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : availableMembers.length > 0 ? (
+                <div className="space-y-2 overflow-y-auto flex-1">
+                  {availableMembers.map((member) => (
+                    <div
+                      key={member._id}
+                      className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-teal-600 rounded-full flex items-center justify-center text-white font-medium">
+                          {member.name?.charAt(0).toUpperCase() || 'U'}
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{member.name}</p>
+                          <p className="text-sm text-gray-500">{member.email}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleAddMember(member._id)}
+                        disabled={addingMember === member._id}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm disabled:opacity-50"
+                      >
+                        {addingMember === member._id ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          'Add'
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <UserGroupIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No available team members</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    All team members are already assigned or no users with "team_member" role exist
+                  </p>
+                </div>
+              )}
+              
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <button
+                  onClick={() => setShowAddMemberModal(false)}
+                  className="w-full py-2 text-gray-600 hover:text-gray-800 font-medium"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* Delete Modal */}
         {showDeleteModal && (

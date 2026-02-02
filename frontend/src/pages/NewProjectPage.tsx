@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
+import { useAuth } from '../context/AuthContext';
 import { projectsAPI } from '../services/api';
 import {
   ArrowLeftIcon,
@@ -10,12 +11,24 @@ import {
   FlagIcon,
   UserGroupIcon,
   DocumentTextIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 
 const NewProjectPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Check if user has permission to create projects
+  const canCreateProject = user?.role === 'admin' || user?.role === 'manager';
+
+  // Redirect if user doesn't have permission
+  useEffect(() => {
+    if (!canCreateProject) {
+      // User doesn't have permission, show error or redirect
+    }
+  }, [canCreateProject]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -28,6 +41,34 @@ const NewProjectPage: React.FC = () => {
     tags: '',
   });
 
+  // If user doesn't have permission, show access denied
+  if (!canCreateProject) {
+    return (
+      <Layout>
+        <div className="max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center"
+          >
+            <ExclamationTriangleIcon className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-red-700 mb-2">Access Denied</h2>
+            <p className="text-red-600 mb-6">
+              Only administrators and managers can create new projects.
+            </p>
+            <Link
+              to="/projects"
+              className="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
+            >
+              <ArrowLeftIcon className="w-5 h-5 mr-2" />
+              Back to Projects
+            </Link>
+          </motion.div>
+        </div>
+      </Layout>
+    );
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -37,26 +78,35 @@ const NewProjectPage: React.FC = () => {
       return;
     }
 
+    if (!formData.description.trim()) {
+      setError('Project description is required');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const projectData = {
+      const projectData: any = {
         name: formData.name,
         description: formData.description,
         status: formData.status,
         priority: formData.priority,
         deadline: formData.deadline || undefined,
-        client: formData.clientName ? {
-          name: formData.clientName,
-          email: formData.clientEmail,
-        } : undefined,
         tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
       };
+
+      // Add client info if provided
+      if (formData.clientName) {
+        projectData.clientInfo = {
+          name: formData.clientName,
+          email: formData.clientEmail || undefined,
+        };
+      }
 
       const response = await projectsAPI.create(projectData);
       navigate(`/projects/${response.data.data._id}`);
     } catch (error: any) {
       console.error('Error creating project:', error);
-      setError(error.response?.data?.message || 'Failed to create project');
+      setError(error.response?.data?.error || error.response?.data?.message || 'Failed to create project');
     } finally {
       setIsSubmitting(false);
     }

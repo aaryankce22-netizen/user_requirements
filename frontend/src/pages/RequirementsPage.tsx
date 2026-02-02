@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
+import { useAuth } from '../context/AuthContext';
 import { requirementsAPI, projectsAPI } from '../services/api';
 import {
   PlusIcon,
@@ -13,6 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const RequirementsPage: React.FC = () => {
+  const { user } = useAuth();
   const [requirements, setRequirements] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -99,14 +101,18 @@ const RequirementsPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Requirements</h1>
-            <p className="text-gray-500 mt-1">Track and manage all project requirements</p>
+            <p className="text-gray-500 mt-1">
+              {user?.role === 'client' 
+                ? 'Submit and track your requirements' 
+                : 'Track and manage all project requirements'}
+            </p>
           </div>
           <Link
             to="/requirements/new"
             className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-lg shadow-purple-500/30"
           >
             <PlusIcon className="w-5 h-5 mr-2" />
-            Add Requirement
+            {user?.role === 'client' ? 'Submit Requirement' : 'Add Requirement'}
           </Link>
         </div>
 

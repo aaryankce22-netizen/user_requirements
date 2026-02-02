@@ -14,21 +14,25 @@ const features = [
     icon: DocumentTextIcon,
     title: 'Centralized Requirements',
     description: 'Collect and manage all client requirements in one place.',
+    link: '/features/requirements',
   },
   {
     icon: FolderIcon,
     title: 'Project Management',
     description: 'Organize projects with team assignments and deadlines.',
+    link: '/features/projects',
   },
   {
     icon: CloudArrowUpIcon,
     title: 'Asset Management',
     description: 'Upload and version control all project assets securely.',
+    link: '/features/assets',
   },
   {
     icon: UserGroupIcon,
     title: 'Team Collaboration',
     description: 'Real-time collaboration with comments and notifications.',
+    link: '/features/collaboration',
   },
 ];
 
@@ -111,19 +115,20 @@ const LandingPage: React.FC = () => {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 * index, duration: 0.5 }}
-                className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:border-indigo-500/50 transition-all hover:transform hover:scale-105"
-              >
-                <feature.icon className="w-12 h-12 text-indigo-400 mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-400">{feature.description}</p>
-              </motion.div>
+              <Link to={feature.link} key={feature.title}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 * index, duration: 0.5 }}
+                  className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:border-indigo-500/50 transition-all hover:transform hover:scale-105 cursor-pointer h-full"
+                >
+                  <feature.icon className="w-12 h-12 text-indigo-400 mb-4" />
+                  <h3 className="text-xl font-semibold text-white mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-400">{feature.description}</p>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </motion.div>

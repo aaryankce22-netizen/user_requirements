@@ -12,8 +12,18 @@ const projectSchema = new mongoose.Schema({
   },
   client: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
+  },
+  clientInfo: {
+    name: {
+      type: String,
+      trim: true
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true
+    }
   },
   teamMembers: [{
     type: mongoose.Schema.Types.ObjectId,

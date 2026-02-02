@@ -127,10 +127,19 @@ const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white"
         >
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.name}! 👋</h1>
-          <p className="text-indigo-100">
-            Here's what's happening with your projects today.
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.name}! 👋</h1>
+              <p className="text-indigo-100">
+                Here's what's happening with your projects today.
+              </p>
+            </div>
+            <div className="hidden sm:block">
+              <span className="px-4 py-2 bg-white/20 rounded-full text-sm font-medium capitalize">
+                {user?.role?.replace('_', ' ')}
+              </span>
+            </div>
+          </div>
         </motion.div>
 
         {/* Stats Grid */}
@@ -160,22 +169,37 @@ const Dashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <div className="flex flex-wrap gap-4">
+          {/* Only admin and manager can create projects */}
+          {(user?.role === 'admin' || user?.role === 'manager') && (
+            <Link
+              to="/projects/new"
+              className="flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/30"
+            >
+              <PlusIcon className="w-5 h-5 mr-2" />
+              New Project
+            </Link>
+          )}
+          {/* Everyone except clients can add requirements, clients use a different flow */}
+          {user?.role !== 'client' ? (
+            <Link
+              to="/requirements/new"
+              className="flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-lg shadow-purple-500/30"
+            >
+              <PlusIcon className="w-5 h-5 mr-2" />
+              Add Requirement
+            </Link>
+          ) : (
+            <Link
+              to="/requirements/new"
+              className="flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-lg shadow-purple-500/30"
+            >
+              <PlusIcon className="w-5 h-5 mr-2" />
+              Submit Requirement
+            </Link>
+          )}
+          {/* Everyone can upload assets */}
           <Link
-            to="/projects/new"
-            className="flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/30"
-          >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            New Project
-          </Link>
-          <Link
-            to="/requirements/new"
-            className="flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-lg shadow-purple-500/30"
-          >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            Add Requirement
-          </Link>
-          <Link
-            to="/assets/upload"
+            to="/assets"
             className="flex items-center px-6 py-3 bg-pink-600 text-white rounded-xl hover:bg-pink-700 transition-colors shadow-lg shadow-pink-500/30"
           >
             <PlusIcon className="w-5 h-5 mr-2" />

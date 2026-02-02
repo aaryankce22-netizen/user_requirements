@@ -19,6 +19,14 @@ import AssetsPage from './pages/AssetsPage';
 import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 
+// Feature Pages
+import {
+  CentralizedRequirementsPage,
+  ProjectManagementPage,
+  AssetManagementPage,
+  TeamCollaborationPage,
+} from './pages/features';
+
 function App() {
   return (
     <AuthProvider>
@@ -28,6 +36,12 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          
+          {/* Feature Pages */}
+          <Route path="/features/requirements" element={<CentralizedRequirementsPage />} />
+          <Route path="/features/projects" element={<ProjectManagementPage />} />
+          <Route path="/features/assets" element={<AssetManagementPage />} />
+          <Route path="/features/collaboration" element={<TeamCollaborationPage />} />
 
           {/* Protected Routes */}
           <Route

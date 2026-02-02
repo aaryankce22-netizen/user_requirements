@@ -124,4 +124,4 @@ Make sure MongoDB is running locally or update the `MONGODB_URI` in `backend/.en
 
 ## 👩‍💻 Author
 
-Priyanshi - 8th Semester Project 2026
+Aaryan - 8th Semester Project 2026

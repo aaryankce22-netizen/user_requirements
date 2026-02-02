@@ -52,6 +52,9 @@ export const projectsAPI = {
   create: (data: any) => api.post('/projects', data),
   update: (id: string, data: any) => api.put(`/projects/${id}`, data),
   delete: (id: string) => api.delete(`/projects/${id}`),
+  getAvailableMembers: (id: string) => api.get(`/projects/${id}/available-members`),
+  addTeamMember: (id: string, userId: string) => api.post(`/projects/${id}/team-members`, { userId }),
+  removeTeamMember: (id: string, userId: string) => api.delete(`/projects/${id}/team-members/${userId}`),
 };
 
 // Requirements API
