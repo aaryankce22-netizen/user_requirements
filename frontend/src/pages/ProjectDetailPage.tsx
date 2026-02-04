@@ -205,22 +205,24 @@ const ProjectDetailPage: React.FC = () => {
               <p className="text-gray-500 mt-1">{project.description}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-3">
-            <Link
-              to={`/projects/${id}/edit`}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
-            >
-              <PencilIcon className="w-4 h-4 mr-2" />
-              Edit
-            </Link>
-            <button
-              onClick={() => setShowDeleteModal(true)}
-              className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
-            >
-              <TrashIcon className="w-4 h-4 mr-2" />
-              Delete
-            </button>
-          </div>
+          {canManageTeam && (
+            <div className="flex items-center space-x-3">
+              <Link
+                to={`/projects/${id}/edit`}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                <PencilIcon className="w-4 h-4 mr-2" />
+                Edit
+              </Link>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors"
+              >
+                <TrashIcon className="w-4 h-4 mr-2" />
+                Delete
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Progress Bar */}

@@ -8,7 +8,7 @@ const requirementSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: [true, 'Requirement description is required']
+    default: ''
   },
   project: {
     type: mongoose.Schema.Types.ObjectId,

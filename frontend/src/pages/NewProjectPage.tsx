@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
@@ -12,23 +12,22 @@ import {
   UserGroupIcon,
   DocumentTextIcon,
   ExclamationTriangleIcon,
+  PencilIcon,
 } from '@heroicons/react/24/outline';
 
 const NewProjectPage: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Check if user has permission to create projects
-  const canCreateProject = user?.role === 'admin' || user?.role === 'manager';
+  // Determine if this is edit mode
+  const isEditMode = !!id;
 
-  // Redirect if user doesn't have permission
-  useEffect(() => {
-    if (!canCreateProject) {
-      // User doesn't have permission, show error or redirect
-    }
-  }, [canCreateProject]);
+  // Check if user has permission to create/edit projects
+  const canManageProject = user?.role === 'admin' || user?.role === 'manager';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -41,8 +40,37 @@ const NewProjectPage: React.FC = () => {
     tags: '',
   });
 
+  // Fetch project data if editing
+  useEffect(() => {
+    const fetchProject = async () => {
+      if (isEditMode && id) {
+        setIsLoading(true);
+        try {
+          const response = await projectsAPI.getOne(id);
+          const project = response.data.data;
+          setFormData({
+            name: project.name || '',
+            description: project.description || '',
+            status: project.status || 'planning',
+            priority: project.priority || 'medium',
+            deadline: project.deadline ? project.deadline.split('T')[0] : '',
+            clientName: project.clientInfo?.name || '',
+            clientEmail: project.clientInfo?.email || '',
+            tags: project.tags?.join(', ') || '',
+          });
+        } catch (error) {
+          console.error('Error fetching project:', error);
+          setError('Failed to load project details');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    fetchProject();
+  }, [id, isEditMode]);
+
   // If user doesn't have permission, show access denied
-  if (!canCreateProject) {
+  if (!canManageProject) {
     return (
       <Layout>
         <div className="max-w-2xl mx-auto">
@@ -54,7 +82,7 @@ const NewProjectPage: React.FC = () => {
             <ExclamationTriangleIcon className="w-16 h-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-red-700 mb-2">Access Denied</h2>
             <p className="text-red-600 mb-6">
-              Only administrators and managers can create new projects.
+              Only administrators and managers can {isEditMode ? 'edit' : 'create'} projects.
             </p>
             <Link
               to="/projects"
@@ -102,11 +130,18 @@ const NewProjectPage: React.FC = () => {
         };
       }
 
-      const response = await projectsAPI.create(projectData);
+      let response;
+      if (isEditMode && id) {
+        // Update existing project
+        response = await projectsAPI.update(id, projectData);
+      } else {
+        // Create new project
+        response = await projectsAPI.create(projectData);
+      }
       navigate(`/projects/${response.data.data._id}`);
     } catch (error: any) {
-      console.error('Error creating project:', error);
-      setError(error.response?.data?.error || error.response?.data?.message || 'Failed to create project');
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} project:`, error);
+      setError(error.response?.data?.error || error.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} project`);
     } finally {
       setIsSubmitting(false);
     }
@@ -132,18 +167,27 @@ const NewProjectPage: React.FC = () => {
         {/* Header */}
         <div className="flex items-center space-x-4 mb-8">
           <button
-            onClick={() => navigate('/projects')}
+            onClick={() => navigate(isEditMode ? `/projects/${id}` : '/projects')}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Create New Project</h1>
-            <p className="text-gray-500 mt-1">Fill in the details to create a new project</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {isEditMode ? 'Edit Project' : 'Create New Project'}
+            </h1>
+            <p className="text-gray-500 mt-1">
+              {isEditMode ? 'Update the project details' : 'Fill in the details to create a new project'}
+            </p>
           </div>
         </div>
 
-        {/* Form */}
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+        /* Form */
         <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -321,7 +365,7 @@ const NewProjectPage: React.FC = () => {
           {/* Actions */}
           <div className="flex items-center justify-end space-x-4">
             <Link
-              to="/projects"
+              to={isEditMode ? `/projects/${id}` : '/projects'}
               className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
             >
               Cancel
@@ -334,17 +378,18 @@ const NewProjectPage: React.FC = () => {
               {isSubmitting ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Creating...</span>
+                  <span>{isEditMode ? 'Updating...' : 'Creating...'}</span>
                 </>
               ) : (
                 <>
-                  <FolderPlusIcon className="w-5 h-5" />
-                  <span>Create Project</span>
+                  {isEditMode ? <PencilIcon className="w-5 h-5" /> : <FolderPlusIcon className="w-5 h-5" />}
+                  <span>{isEditMode ? 'Update Project' : 'Create Project'}</span>
                 </>
               )}
             </button>
           </div>
         </motion.form>
+        )}
       </div>
     </Layout>
   );

@@ -62,7 +62,6 @@ router.get('/:id', protect, async (req, res) => {
 router.post('/', [
   protect,
   body('title').notEmpty().withMessage('Title is required'),
-  body('description').notEmpty().withMessage('Description is required'),
   body('project').notEmpty().withMessage('Project is required')
 ], async (req, res) => {
   const errors = validationResult(req);
@@ -73,11 +72,13 @@ router.post('/', [
   try {
     const requirement = await Requirement.create({
       ...req.body,
+      description: req.body.description || '',
       createdBy: req.user.id
     });
 
     res.status(201).json({ success: true, data: requirement });
   } catch (err) {
+    console.error('Error creating requirement:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
