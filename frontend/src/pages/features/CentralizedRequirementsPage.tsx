@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import ThreeBackground from '../../components/ThreeBackground';
 import {
   DocumentTextIcon,
   CheckCircleIcon,
@@ -11,6 +10,7 @@ import {
   ArrowPathIcon,
   ChartBarIcon,
   BellIcon,
+  ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 
 const features = [
@@ -58,29 +58,21 @@ const features = [
 
 const CentralizedRequirementsPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900 relative overflow-hidden">
-      <ThreeBackground />
-
+    <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="relative z-10 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <nav className="border-b border-surface-100">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-xl">R</span>
+            <div className="w-9 h-9 bg-primary-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">R</span>
             </div>
-            <span className="text-xl font-bold text-white">RequirementsHub</span>
+            <span className="text-lg font-bold text-surface-900 tracking-tight">RequirementsHub</span>
           </Link>
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/login"
-              className="px-4 py-2 text-white hover:text-indigo-300 transition-colors"
-            >
-              Login
+          <div className="flex items-center space-x-3">
+            <Link to="/login" className="px-4 py-2 text-sm font-medium text-surface-600 hover:text-surface-900 transition-colors">
+              Sign in
             </Link>
-            <Link
-              to="/register"
-              className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full hover:shadow-lg hover:shadow-indigo-500/50 transition-all"
-            >
+            <Link to="/register" className="px-5 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
               Get Started
             </Link>
           </div>
@@ -88,39 +80,25 @@ const CentralizedRequirementsPage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center"
-        >
-          <div className="inline-flex items-center px-4 py-2 bg-indigo-500/20 rounded-full mb-6">
-            <DocumentTextIcon className="w-5 h-5 text-indigo-400 mr-2" />
-            <span className="text-indigo-300 text-sm font-medium">Centralized Requirements</span>
+      <div className="max-w-6xl mx-auto px-6 pt-16 pb-20">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
+          <div className="inline-flex items-center px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm font-medium mb-6">
+            <DocumentTextIcon className="w-4 h-4 mr-1.5" />
+            Centralized Requirements
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-            Collect and Manage All
-            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              {' '}Requirements{' '}
-            </span>
-            in One Place
+          <h1 className="text-4xl md:text-5xl font-bold text-surface-900 mb-6 leading-tight tracking-tight">
+            Collect and manage all <span className="text-primary-600">requirements</span> in one place
           </h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-10">
-            Stop juggling spreadsheets and emails. Our centralized requirements management system 
+          <p className="text-lg text-surface-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Stop juggling spreadsheets and emails. Our centralized requirements management system
             brings all your client needs together in one organized, searchable hub.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/register"
-              className="px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-lg font-semibold rounded-full hover:shadow-xl hover:shadow-indigo-500/30 transition-all transform hover:scale-105"
-            >
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link to="/register" className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition-colors">
               Start Free Trial
             </Link>
-            <Link
-              to="/"
-              className="px-8 py-4 border-2 border-white/30 text-white text-lg font-semibold rounded-full hover:bg-white/10 transition-all"
-            >
+            <Link to="/" className="inline-flex items-center justify-center px-6 py-3 border border-surface-200 text-surface-700 font-semibold rounded-lg hover:bg-surface-50 transition-colors">
+              <ArrowLeftIcon className="w-4 h-4 mr-1.5" />
               Back to Home
             </Link>
           </div>
@@ -128,107 +106,66 @@ const CentralizedRequirementsPage: React.FC = () => {
       </div>
 
       {/* Features Grid */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pb-20">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-        >
-          <h2 className="text-3xl font-bold text-white text-center mb-4">
-            Powerful Features for Requirements Management
-          </h2>
-          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
+      <div className="bg-surface-50 border-y border-surface-100">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-bold text-surface-900 text-center mb-3">Powerful Features for Requirements Management</h2>
+          <p className="text-surface-500 text-center mb-12 max-w-2xl mx-auto">
             Everything you need to capture, organize, and track requirements throughout your project lifecycle.
           </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index, duration: 0.5 }}
-                className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:border-indigo-500/50 transition-all hover:transform hover:scale-105"
+                transition={{ delay: 0.08 * index, duration: 0.4 }}
+                className="bg-white rounded-xl p-5 border border-surface-100 hover:border-primary-200 hover:shadow-soft transition-all"
               >
-                <feature.icon className="w-10 h-10 text-indigo-400 mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-400 text-sm">{feature.description}</p>
+                <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center mb-3">
+                  <feature.icon className="w-5 h-5 text-primary-600" />
+                </div>
+                <h3 className="text-sm font-semibold text-surface-900 mb-1">{feature.title}</h3>
+                <p className="text-xs text-surface-500 leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      {/* How It Works Section */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pb-20">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-          className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-white/10"
-        >
-          <h2 className="text-3xl font-bold text-white text-center mb-12">
-            How It Works
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl font-bold">1</span>
+      {/* How It Works */}
+      <div className="max-w-6xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-surface-900 text-center mb-12">How It Works</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { step: '1', title: 'Capture', desc: 'Easily input requirements from any source - meetings, emails, or client documents.' },
+            { step: '2', title: 'Organize', desc: 'Categorize and prioritize requirements with tags, statuses, and custom fields.' },
+            { step: '3', title: 'Track', desc: 'Monitor progress and ensure all requirements are addressed throughout development.' },
+          ].map((item) => (
+            <div key={item.step} className="text-center">
+              <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white text-lg font-bold">{item.step}</span>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Capture</h3>
-              <p className="text-gray-400">
-                Easily input requirements from any source - meetings, emails, or client documents.
-              </p>
+              <h3 className="text-lg font-semibold text-surface-900 mb-2">{item.title}</h3>
+              <p className="text-sm text-surface-500">{item.desc}</p>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl font-bold">2</span>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Organize</h3>
-              <p className="text-gray-400">
-                Categorize and prioritize requirements with tags, statuses, and custom fields.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white text-2xl font-bold">3</span>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Track</h3>
-              <p className="text-gray-400">
-                Monitor progress and ensure all requirements are addressed throughout development.
-              </p>
-            </div>
-          </div>
-        </motion.div>
+          ))}
+        </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pb-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.8 }}
-          className="text-center"
-        >
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to streamline your requirements?
-          </h2>
-          <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-            Join thousands of teams who have simplified their requirement management process.
-          </p>
-          <Link
-            to="/register"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-lg font-semibold rounded-full hover:shadow-xl hover:shadow-indigo-500/30 transition-all transform hover:scale-105"
-          >
+      {/* CTA */}
+      <div className="bg-primary-600">
+        <div className="max-w-6xl mx-auto px-6 py-16 text-center">
+          <h2 className="text-2xl font-bold text-white mb-3">Ready to streamline your requirements?</h2>
+          <p className="text-primary-100 mb-8 max-w-xl mx-auto">Join teams who have simplified their requirement management process.</p>
+          <Link to="/register" className="inline-block px-6 py-3 bg-white text-primary-700 font-semibold rounded-lg hover:bg-primary-50 transition-colors">
             Get Started Free
           </Link>
-        </motion.div>
+        </div>
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-8">
-        <div className="max-w-7xl mx-auto px-6 text-center text-gray-400">
+      <footer className="border-t border-surface-100 py-8">
+        <div className="max-w-6xl mx-auto px-6 text-center text-surface-400 text-sm">
           <p>&copy; 2026 RequirementsHub. Built for 8th Semester Project.</p>
         </div>
       </footer>

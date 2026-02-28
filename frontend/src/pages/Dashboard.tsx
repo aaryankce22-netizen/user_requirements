@@ -9,10 +9,9 @@ import {
   DocumentTextIcon,
   PhotoIcon,
   PlusIcon,
-  ArrowTrendingUpIcon,
   ClockIcon,
   CheckCircleIcon,
-  ExclamationCircleIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline';
 
 interface Stats {
@@ -71,40 +70,44 @@ const Dashboard: React.FC = () => {
       title: 'Total Projects',
       value: stats.totalProjects,
       icon: FolderIcon,
-      color: 'from-blue-500 to-blue-600',
+      color: 'bg-blue-50 text-blue-600',
+      borderColor: 'border-l-blue-500',
       link: '/projects',
     },
     {
       title: 'Requirements',
       value: stats.totalRequirements,
       icon: DocumentTextIcon,
-      color: 'from-purple-500 to-purple-600',
+      color: 'bg-violet-50 text-violet-600',
+      borderColor: 'border-l-violet-500',
       link: '/requirements',
     },
     {
       title: 'Assets',
       value: stats.totalAssets,
       icon: PhotoIcon,
-      color: 'from-pink-500 to-pink-600',
+      color: 'bg-rose-50 text-rose-600',
+      borderColor: 'border-l-rose-500',
       link: '/assets',
     },
     {
       title: 'Pending Review',
       value: stats.pendingRequirements,
       icon: ClockIcon,
-      color: 'from-amber-500 to-amber-600',
+      color: 'bg-amber-50 text-amber-600',
+      borderColor: 'border-l-amber-500',
       link: '/requirements?status=pending',
     },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-700';
-      case 'in_progress': return 'bg-blue-100 text-blue-700';
-      case 'pending': return 'bg-yellow-100 text-yellow-700';
-      case 'approved': return 'bg-emerald-100 text-emerald-700';
-      case 'rejected': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'completed': return 'bg-emerald-50 text-emerald-700';
+      case 'in_progress': return 'bg-blue-50 text-blue-700';
+      case 'pending': return 'bg-amber-50 text-amber-700';
+      case 'approved': return 'bg-emerald-50 text-emerald-700';
+      case 'rejected': return 'bg-rose-50 text-rose-700';
+      default: return 'bg-surface-100 text-surface-700';
     }
   };
 
@@ -112,7 +115,7 @@ const Dashboard: React.FC = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       </Layout>
     );
@@ -120,47 +123,47 @@ const Dashboard: React.FC = () => {
 
   return (
     <Layout>
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white"
         >
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.name}! 👋</h1>
-              <p className="text-indigo-100">
+              <h1 className="text-2xl font-bold text-surface-900">
+                Welcome back, {user?.name}
+              </h1>
+              <p className="text-surface-500 mt-1 text-sm">
                 Here's what's happening with your projects today.
               </p>
             </div>
-            <div className="hidden sm:block">
-              <span className="px-4 py-2 bg-white/20 rounded-full text-sm font-medium capitalize">
-                {user?.role?.replace('_', ' ')}
-              </span>
-            </div>
+            <span className="hidden sm:inline-flex px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm font-medium capitalize">
+              {user?.role?.replace('_', ' ')}
+            </span>
           </div>
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {statCards.map((stat, index) => (
             <motion.div
               key={stat.title}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.08 }}
             >
               <Link to={stat.link}>
-                <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center`}>
-                      <stat.icon className="w-6 h-6 text-white" />
+                <div className={`bg-white rounded-xl p-5 border border-surface-100 border-l-4 ${stat.borderColor} hover:shadow-soft transition-all group`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-surface-500">{stat.title}</p>
+                      <p className="text-2xl font-bold text-surface-900 mt-1">{stat.value}</p>
                     </div>
-                    <ArrowTrendingUpIcon className="w-5 h-5 text-green-500" />
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.color}`}>
+                      <stat.icon className="w-5 h-5" />
+                    </div>
                   </div>
-                  <h3 className="text-3xl font-bold text-gray-900">{stat.value}</h3>
-                  <p className="text-gray-500 text-sm">{stat.title}</p>
                 </div>
               </Link>
             </motion.div>
@@ -168,89 +171,87 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="flex flex-wrap gap-4">
-          {/* Only admin and manager can create projects */}
+        <div className="flex flex-wrap gap-3">
           {(user?.role === 'admin' || user?.role === 'manager') && (
             <Link
               to="/projects/new"
-              className="flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/30"
+              className="inline-flex items-center px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
             >
-              <PlusIcon className="w-5 h-5 mr-2" />
+              <PlusIcon className="w-4 h-4 mr-1.5" />
               New Project
             </Link>
           )}
-          {/* Everyone except clients can add requirements, clients use a different flow */}
           {user?.role !== 'client' ? (
             <Link
               to="/requirements/new"
-              className="flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-lg shadow-purple-500/30"
+              className="inline-flex items-center px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors"
             >
-              <PlusIcon className="w-5 h-5 mr-2" />
+              <PlusIcon className="w-4 h-4 mr-1.5" />
               Add Requirement
             </Link>
           ) : (
             <Link
               to="/requirements/new"
-              className="flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-lg shadow-purple-500/30"
+              className="inline-flex items-center px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors"
             >
-              <PlusIcon className="w-5 h-5 mr-2" />
+              <PlusIcon className="w-4 h-4 mr-1.5" />
               Submit Requirement
             </Link>
           )}
-          {/* Everyone can upload assets */}
           <Link
             to="/assets"
-            className="flex items-center px-6 py-3 bg-pink-600 text-white rounded-xl hover:bg-pink-700 transition-colors shadow-lg shadow-pink-500/30"
+            className="inline-flex items-center px-4 py-2 bg-white text-surface-700 text-sm font-medium rounded-lg border border-surface-200 hover:bg-surface-50 transition-colors"
           >
-            <PlusIcon className="w-5 h-5 mr-2" />
+            <PlusIcon className="w-4 h-4 mr-1.5" />
             Upload Asset
           </Link>
         </div>
 
         {/* Recent Activity */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6">
           {/* Recent Projects */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+            className="bg-white rounded-xl border border-surface-100"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Recent Projects</h2>
-              <Link to="/projects" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-surface-100">
+              <h2 className="text-base font-semibold text-surface-900">Recent Projects</h2>
+              <Link to="/projects" className="text-primary-600 hover:text-primary-700 text-sm font-medium inline-flex items-center">
                 View all
+                <ArrowRightIcon className="w-3.5 h-3.5 ml-1" />
               </Link>
             </div>
             {recentProjects.length > 0 ? (
-              <div className="space-y-4">
+              <div className="divide-y divide-surface-50">
                 {recentProjects.map((project) => (
                   <Link
                     key={project._id}
                     to={`/projects/${project._id}`}
-                    className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between px-5 py-3 hover:bg-surface-50 transition-colors"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                        <FolderIcon className="w-5 h-5 text-indigo-600" />
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FolderIcon className="w-4 h-4 text-blue-600" />
                       </div>
-                      <div>
-                        <h3 className="font-medium text-gray-900">{project.name}</h3>
-                        <p className="text-sm text-gray-500 truncate max-w-xs">
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-medium text-surface-900 truncate">{project.name}</h3>
+                        <p className="text-xs text-surface-400 truncate max-w-[200px]">
                           {project.description}
                         </p>
                       </div>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${getStatusColor(project.status)}`}>
                       {project.status?.replace('_', ' ')}
                     </span>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <FolderIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p>No projects yet</p>
-                <Link to="/projects/new" className="text-indigo-600 hover:underline text-sm">
+              <div className="text-center py-10 px-5">
+                <FolderIcon className="w-10 h-10 mx-auto text-surface-200 mb-2" />
+                <p className="text-sm text-surface-500">No projects yet</p>
+                <Link to="/projects/new" className="text-primary-600 hover:underline text-sm">
                   Create your first project
                 </Link>
               </div>
@@ -261,51 +262,52 @@ const Dashboard: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100"
+            className="bg-white rounded-xl border border-surface-100"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Recent Requirements</h2>
-              <Link to="/requirements" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-surface-100">
+              <h2 className="text-base font-semibold text-surface-900">Recent Requirements</h2>
+              <Link to="/requirements" className="text-primary-600 hover:text-primary-700 text-sm font-medium inline-flex items-center">
                 View all
+                <ArrowRightIcon className="w-3.5 h-3.5 ml-1" />
               </Link>
             </div>
             {recentRequirements.length > 0 ? (
-              <div className="space-y-4">
+              <div className="divide-y divide-surface-50">
                 {recentRequirements.map((req) => (
                   <Link
                     key={req._id}
                     to={`/requirements/${req._id}`}
-                    className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between px-5 py-3 hover:bg-surface-50 transition-colors"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        req.status === 'approved' ? 'bg-green-100' :
-                        req.status === 'pending' ? 'bg-yellow-100' : 'bg-gray-100'
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        req.status === 'approved' ? 'bg-emerald-50' :
+                        req.status === 'pending' ? 'bg-amber-50' : 'bg-surface-100'
                       }`}>
                         {req.status === 'approved' ? (
-                          <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                          <CheckCircleIcon className="w-4 h-4 text-emerald-600" />
                         ) : req.status === 'pending' ? (
-                          <ClockIcon className="w-5 h-5 text-yellow-600" />
+                          <ClockIcon className="w-4 h-4 text-amber-600" />
                         ) : (
-                          <DocumentTextIcon className="w-5 h-5 text-gray-600" />
+                          <DocumentTextIcon className="w-4 h-4 text-surface-500" />
                         )}
                       </div>
-                      <div>
-                        <h3 className="font-medium text-gray-900">{req.title}</h3>
-                        <p className="text-sm text-gray-500">{req.category}</p>
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-medium text-surface-900 truncate">{req.title}</h3>
+                        <p className="text-xs text-surface-400">{req.category}</p>
                       </div>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(req.status)}`}>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${getStatusColor(req.status)}`}>
                       {req.status}
                     </span>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <DocumentTextIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p>No requirements yet</p>
-                <Link to="/requirements/new" className="text-indigo-600 hover:underline text-sm">
+              <div className="text-center py-10 px-5">
+                <DocumentTextIcon className="w-10 h-10 mx-auto text-surface-200 mb-2" />
+                <p className="text-sm text-surface-500">No requirements yet</p>
+                <Link to="/requirements/new" className="text-primary-600 hover:underline text-sm">
                   Add your first requirement
                 </Link>
               </div>

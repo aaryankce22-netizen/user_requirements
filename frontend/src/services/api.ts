@@ -43,6 +43,14 @@ export const authAPI = {
   register: (name: string, email: string, password: string, role?: string) =>
     api.post('/auth/register', { name, email, password, role }),
   getMe: () => api.get('/auth/me'),
+  forgotPassword: (email: string) =>
+    api.post('/auth/forgot-password', { email }),
+  resetPassword: (token: string, password: string) =>
+    api.post(`/auth/reset-password/${token}`, { password }),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.put('/auth/change-password', { currentPassword, newPassword }),
+  updateProfile: (data: { name?: string; avatar?: string }) =>
+    api.put('/auth/profile', data),
 };
 
 // Projects API

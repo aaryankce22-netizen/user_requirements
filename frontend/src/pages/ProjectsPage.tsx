@@ -8,7 +8,6 @@ import {
   PlusIcon,
   FolderIcon,
   MagnifyingGlassIcon,
-  FunnelIcon,
   CalendarIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/outline';
@@ -47,22 +46,12 @@ const ProjectsPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-700 border-green-200';
-      case 'in_progress': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'planning': return 'bg-purple-100 text-purple-700 border-purple-200';
-      case 'review': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'on_hold': return 'bg-gray-100 text-gray-700 border-gray-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'critical': return 'bg-red-500';
-      case 'high': return 'bg-orange-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
+      case 'completed': return 'bg-emerald-50 text-emerald-700';
+      case 'in_progress': return 'bg-blue-50 text-blue-700';
+      case 'planning': return 'bg-violet-50 text-violet-700';
+      case 'review': return 'bg-amber-50 text-amber-700';
+      case 'on_hold': return 'bg-surface-100 text-surface-600';
+      default: return 'bg-surface-100 text-surface-600';
     }
   };
 
@@ -70,7 +59,7 @@ const ProjectsPage: React.FC = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       </Layout>
     );
@@ -82,42 +71,41 @@ const ProjectsPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-            <p className="text-gray-500 mt-1">
-              {user?.role === 'client' 
-                ? 'View your assigned projects' 
+            <h1 className="text-2xl font-bold text-surface-900">Projects</h1>
+            <p className="text-surface-500 mt-1 text-sm">
+              {user?.role === 'client'
+                ? 'View your assigned projects'
                 : 'Manage all your client projects'}
             </p>
           </div>
           {canCreateProject && (
             <Link
               to="/projects/new"
-              className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/30"
+              className="inline-flex items-center px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
             >
-              <PlusIcon className="w-5 h-5 mr-2" />
+              <PlusIcon className="w-4 h-4 mr-1.5" />
               New Project
             </Link>
           )}
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-surface-400" />
             <input
               type="text"
               placeholder="Search projects..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-surface-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
           <div className="relative">
-            <FunnelIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="pl-12 pr-8 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none bg-white"
+              className="pl-4 pr-8 py-2.5 bg-white border border-surface-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none"
             >
               <option value="all">All Status</option>
               <option value="planning">Planning</option>
@@ -131,38 +119,35 @@ const ProjectsPage: React.FC = () => {
 
         {/* Projects Grid */}
         {filteredProjects.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProjects.map((project, index) => (
               <motion.div
                 key={project._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.05 }}
               >
                 <Link to={`/projects/${project._id}`}>
-                  <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-gray-100 hover:border-indigo-200 group">
-                    {/* Priority indicator */}
-                    <div className={`w-full h-1 ${getPriorityColor(project.priority)} rounded-full mb-4`}></div>
-                    
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
-                        <FolderIcon className="w-6 h-6 text-indigo-600" />
+                  <div className="bg-white rounded-xl p-5 border border-surface-100 hover:border-primary-200 hover:shadow-soft transition-all group">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <FolderIcon className="w-4.5 h-4.5 text-blue-600" />
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(project.status)}`}>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
                         {project.status?.replace('_', ' ')}
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">
+                    <h3 className="text-base font-semibold text-surface-900 mb-1 group-hover:text-primary-700 transition-colors truncate">
                       {project.name}
                     </h3>
-                    <p className="text-gray-500 text-sm line-clamp-2 mb-4">
+                    <p className="text-sm text-surface-500 line-clamp-2 mb-4 leading-relaxed">
                       {project.description}
                     </p>
 
-                    <div className="flex items-center justify-between text-sm text-gray-400">
+                    <div className="flex items-center justify-between text-xs text-surface-400 pt-3 border-t border-surface-50">
                       <div className="flex items-center space-x-1">
-                        <CalendarIcon className="w-4 h-4" />
+                        <CalendarIcon className="w-3.5 h-3.5" />
                         <span>
                           {project.deadline
                             ? new Date(project.deadline).toLocaleDateString()
@@ -170,8 +155,8 @@ const ProjectsPage: React.FC = () => {
                         </span>
                       </div>
                       <div className="flex items-center space-x-1">
-                        <UserGroupIcon className="w-4 h-4" />
-                        <span>{project.teamMembers?.length || 0}</span>
+                        <UserGroupIcon className="w-3.5 h-3.5" />
+                        <span>{project.teamMembers?.length || 0} members</span>
                       </div>
                     </div>
                   </div>
@@ -180,21 +165,23 @@ const ProjectsPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-lg border border-gray-100">
-            <FolderIcon className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No projects found</h3>
-            <p className="text-gray-500 mb-6">
+          <div className="text-center py-16 bg-white rounded-xl border border-surface-100">
+            <FolderIcon className="w-12 h-12 mx-auto text-surface-200 mb-3" />
+            <h3 className="text-lg font-semibold text-surface-900 mb-1">No projects found</h3>
+            <p className="text-sm text-surface-500 mb-6">
               {searchTerm || statusFilter !== 'all'
                 ? 'Try adjusting your search or filter'
                 : 'Get started by creating your first project'}
             </p>
-            <Link
-              to="/projects/new"
-              className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors"
-            >
-              <PlusIcon className="w-5 h-5 mr-2" />
-              Create Project
-            </Link>
+            {canCreateProject && (
+              <Link
+                to="/projects/new"
+                className="inline-flex items-center px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                <PlusIcon className="w-4 h-4 mr-1.5" />
+                Create Project
+              </Link>
+            )}
           </div>
         )}
       </div>

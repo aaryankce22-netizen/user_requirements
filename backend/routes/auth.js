@@ -157,17 +157,27 @@ router.post('/forgot-password', [
 
     // Generate reset token
     const resetToken = await PasswordReset.createToken(user._id);
-    
+
     // Create reset URL
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
 
     // Send email
-    await sendEmail(user.email, 'passwordReset', [user.name, resetUrl]);
+    const emailResult = await sendEmail(user.email, 'passwordReset', [user.name, resetUrl]);
 
-    res.json({ 
-      success: true, 
-      message: 'If an account exists with that email, a password reset link has been sent.' 
-    });
+    const response = {
+      success: true,
+      message: 'If an account exists with that email, a password reset link has been sent.'
+    };
+
+    // In non-production, include the reset URL so the flow can be tested without real email
+    if (process.env.NODE_ENV !== 'production') {
+      response.resetUrl = resetUrl;
+    }
+    if (!emailResult.success) {
+      console.log('📧 Reset URL (email not sent):', resetUrl);
+    }
+
+    res.json(response);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error sending password reset email' });
@@ -196,8 +206,13 @@ router.post('/reset-password/:token', [
       return res.status(400).json({ error: 'Invalid or expired reset token' });
     }
 
+    // Fetch user directly with password field to ensure save works correctly
+    const user = await User.findById(resetRecord.user._id).select('+password');
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
     // Update password
-    const user = resetRecord.user;
     user.password = password;
     await user.save();
 
@@ -235,8 +250,12 @@ router.put('/change-password', protect, [
   try {
     const { currentPassword, newPassword } = req.body;
 
-    // Get user with password
-    const user = await User.findById(req.user.id).select('+password');
+        // Get user with password (use _id instead of id)
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     // Check current password
     const isMatch = await user.comparePassword(currentPassword);

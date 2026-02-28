@@ -1,11 +1,38 @@
 const nodemailer = require('nodemailer');
 
+// Dev mode fallback transporter
+const devTransporter = {
+  sendMail: async (options) => {
+    console.log('\n📧 ═══════════════════════════════════════════════════════════');
+    console.log('📧 EMAIL (Development Mode)');
+    console.log('📧 ═══════════════════════════════════════════════════════════');
+    console.log('📧 To:', options.to);
+    console.log('📧 Subject:', options.subject);
+    console.log('📧 ───────────────────────────────────────────────────────────');
+    console.log('📧 Content:', options.text);
+    console.log('📧 ═══════════════════════════════════════════════════════════\n');
+    return { messageId: 'dev-' + Date.now() };
+  }
+};
+
+// Check if SMTP credentials are real (not placeholder values)
+const isValidSmtpConfig = () => {
+  const user = process.env.SMTP_USER || '';
+  const pass = process.env.SMTP_PASS || '';
+  const placeholders = ['your-gmail', 'your-email', 'your-16-char', 'changeme', 'placeholder'];
+  return (
+    process.env.SMTP_HOST &&
+    user &&
+    pass &&
+    !placeholders.some(p => user.includes(p) || pass.includes(p))
+  );
+};
+
 // Create transporter
 const createTransporter = () => {
-  // Check if SMTP is configured
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  if (isValidSmtpConfig()) {
     console.log('📧 Email configured with SMTP');
-    return nodemailer.createTransport({
+    const smtpTransporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT) || 587,
       secure: process.env.SMTP_SECURE === 'true',
@@ -14,23 +41,22 @@ const createTransporter = () => {
         pass: process.env.SMTP_PASS
       }
     });
+
+    // Wrap to fall back to dev mode on failure
+    return {
+      sendMail: async (options) => {
+        try {
+          return await smtpTransporter.sendMail(options);
+        } catch (err) {
+          console.error('📧 SMTP failed, falling back to console logging:', err.message);
+          return devTransporter.sendMail(options);
+        }
+      }
+    };
   }
-  
-  // Development - log emails to console
+
   console.log('📧 Email running in development mode (logging to console)');
-  return {
-    sendMail: async (options) => {
-      console.log('\n📧 ═══════════════════════════════════════════════════════════');
-      console.log('📧 EMAIL WOULD BE SENT (Development Mode)');
-      console.log('📧 ═══════════════════════════════════════════════════════════');
-      console.log('📧 To:', options.to);
-      console.log('📧 Subject:', options.subject);
-      console.log('📧 ───────────────────────────────────────────────────────────');
-      console.log('📧 Content:', options.text);
-      console.log('📧 ═══════════════════════════════════════════════════════════\n');
-      return { messageId: 'dev-' + Date.now() };
-    }
-  };
+  return devTransporter;
 };
 
 const transporter = createTransporter();
